@@ -6,6 +6,10 @@ from agents.search_agent import SearchAgent
 from llm.oai import TextChatAtOAI
 from gui.web_ui import WebUI
 import datetime
+from search import Search
+from visit import Visit
+from scholar import Scholar
+from tool_python import PythonInterpreter
 
 DR_MODEL_NAME = os.getenv("DR_MODEL_NAME", "")
 DR_MODEL_SERVER = os.getenv("DR_MODEL_SERVER", "")
