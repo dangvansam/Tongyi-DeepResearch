@@ -104,7 +104,7 @@ def app_gui():
         chatbot_config=chatbot_config,
     ).run(
         message=messages,
-        share=True,
+        share=False,
         server_name='127.0.0.1',
         server_port=7860,
         concurrency_limit=20,
