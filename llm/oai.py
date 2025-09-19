@@ -7,6 +7,7 @@ from pprint import pformat
 from typing import Dict, Iterator, List, Optional, Literal, Union
 
 import openai
+from openai import OpenAIError, RateLimitError 
 
 if openai.__version__.startswith('0.'):
     from openai.error import OpenAIError  # noqa
