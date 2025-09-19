@@ -209,7 +209,7 @@ class WebUI:
 
         demo.queue(default_concurrency_limit=concurrency_limit).launch(share=share,
                                                                        server_name=server_name,
-                                                                       server_port=server_port)
+                                                                       server_port=server_port,ssr_mode=False)
 
     def change_agent(self, agent_selector):
         yield agent_selector, self._create_agent_info_block(agent_selector), self._create_agent_plugins_block(
