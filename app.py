@@ -106,7 +106,7 @@ def app_gui():
         message=messages,
         share=False,
         server_name='127.0.0.1',
-        server_port=8080,
+        server_port=8000,
         concurrency_limit=20,
         enable_mention=False,
     )
