@@ -160,8 +160,8 @@ class TextChatAtOAI(BaseFnCallModel):
                 for chunk in response:
                     if chunk.choices:
                         choice = chunk.choices[0]
-                        if hasattr(choice.delta, 'reasoning_content') and choice.delta.reasoning_content:
-                            full_reasoning_content += choice.delta.reasoning_content
+                        if hasattr(choice.delta, 'reasoning') and choice.delta.reasoning:
+                            full_reasoning_content += choice.delta.reasoning
                         if hasattr(choice.delta, 'content') and choice.delta.content:
                             full_response += choice.delta.content
                         # 兼容 map agent 模型
@@ -179,7 +179,7 @@ class TextChatAtOAI(BaseFnCallModel):
                             function_json = json.dumps(function_call, ensure_ascii=False)
                             logger.info(json.dumps(function_call, ensure_ascii=False, indent=4))
                             full_response += f'<tool_call>{function_json}</tool_call>'
-                        yield [Message(role=ASSISTANT, content=full_response, reasoning_content=full_reasoning_content)]
+                        yield [Message(role=ASSISTANT, content=full_response, reasoning=full_reasoning_content)]
                     logger.info(f'message chunk: {chunk}')
         except OpenAIError as ex:
             raise ModelServiceError(exception=ex)
