@@ -79,7 +79,7 @@ class PythonInterpreter(BaseToolWithFileAccess):
             #     if triple_match:
             #         code = triple_match.group(1)
             except Exception:
-            #     return '[Python Interpreter Error]: format error.'
+                return '[Python Interpreter Error]: format error.'
 
             if not code.strip():
                 return '[Python Interpreter Error]: Empty code.'
