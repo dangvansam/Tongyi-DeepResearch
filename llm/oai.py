@@ -179,7 +179,7 @@ class TextChatAtOAI(BaseFnCallModel):
                             function_json = json.dumps(function_call, ensure_ascii=False)
                             logger.info(json.dumps(function_call, ensure_ascii=False, indent=4))
                             full_response += f'<tool_call>{function_json}</tool_call>'
-                        yield [Message(role=ASSISTANT, content=full_response, reasoning=full_reasoning_content)]
+                        yield [Message(role=ASSISTANT, content=full_response, reasoning_content=full_reasoning_content)]
                     logger.info(f'message chunk: {chunk}')
         except OpenAIError as ex:
             raise ModelServiceError(exception=ex)
