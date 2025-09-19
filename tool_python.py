@@ -69,17 +69,17 @@ class PythonInterpreter(BaseToolWithFileAccess):
             # super().call(params=params, files=files)  # copy remote files to work_dir
             try:
                 code=params.split('<code>')[1].split('</code')[0]
-                print(params)
-                if type(params) is str:
-                    params = json5.loads(params)
-                code = params.get('code', '')
-                if not code:
-                    code = params.get('raw', '')
-                triple_match = re.search(r'```[^\n]*\n(.+?)```', code, re.DOTALL)
-                if triple_match:
-                    code = triple_match.group(1)
+            #     print(params)
+            #     if type(params) is str:
+            #         params = json5.loads(params)
+            #     code = params.get('code', '')
+            #     if not code:
+            #         code = params.get('raw', '')
+            #     triple_match = re.search(r'```[^\n]*\n(.+?)```', code, re.DOTALL)
+            #     if triple_match:
+            #         code = triple_match.group(1)
             except Exception:
-                code = extract_code(params)
+            #     return '[Python Interpreter Error]: format error.'
 
             if not code.strip():
                 return '[Python Interpreter Error]: Empty code.'
