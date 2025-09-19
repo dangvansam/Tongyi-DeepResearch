@@ -129,7 +129,30 @@ class TextChatAtOAI(BaseFnCallModel):
         messages = self.convert_messages_to_dicts(messages)
             
         try:
-            response = self._chat_complete_create(model=self.model, messages=messages, stream=True, **generate_cfg)
+            MAX_RETRIES = 5 
+            INITIAL_DELAY = 2  
+            response = None 
+        
+            for attempt in range(MAX_RETRIES):
+                try:
+                    response = self._chat_complete_create(model=self.model, messages=messages, stream=True, **generate_cfg)
+                    break
+
+                except RateLimitError as ex:
+                    if attempt == MAX_RETRIES - 1:
+                        logger.error(f"API rate limit error after {MAX_RETRIES} retries. Raising exception.")
+                        raise ModelServiceError(exception=ex) from ex
+
+                    delay = INITIAL_DELAY * (2 ** attempt) + random.uniform(0, 1)
+                    logger.warning(
+                        f"Rate limit exceeded. Retrying in {delay:.2f} seconds... (Attempt {attempt + 1}/{MAX_RETRIES})"
+                    )
+                    time.sleep(delay)
+
+                except OpenAIError as ex:
+                    logger.error(f"An OpenAI error occurred: {ex}")
+                    raise ModelServiceError(exception=ex) from ex
+            # response = self._chat_complete_create(model=self.model, messages=messages, stream=True, **generate_cfg)
             if delta_stream:
                 for chunk in response:
                     if chunk.choices:
