@@ -80,7 +80,7 @@ def app_gui():
 
     chatbot_config = {
         'prompt.suggestions': [
-            '中国国足的一场比赛，国足首先失球，由一名宿姓球员扳平了。后来还发生了点球。比分最终是平均。有可能是哪几场比赛',
+            '中国国足的一场比赛，国足首先失球，由一名宿姓球员扳平了。后来还发生了点球。比分最终是平局。这是哪场比赛？',
             'When is the paper submission deadline for the ACL 2025 Industry Track, and what is the venue address for the conference?',
             'On June 6, 2023, an article by Carolyn Collins Petersen was published in Universe Today. This article mentions a team that produced a paper about their observations, linked at the bottom of the article. Find this paper. Under what NASA award number was the work performed by R. G. Arendt supported by?',
             '有一位华语娱乐圈的重要人物，与其兄弟共同创作并主演了一部在中国南方沿海城市上映的喜剧电影，这部电影成为该类型的开山之作。与此同时，这位人物还凭借两首极具影响力的本地方言歌曲在音乐领域取得突破，极大推动了本地方言流行音乐的发展。请问，这一切发生在20世纪70年代的哪一年？',
