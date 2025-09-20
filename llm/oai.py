@@ -135,6 +135,8 @@ class TextChatAtOAI(BaseFnCallModel):
         try:
             MAX_RETRIES = 5 
             INITIAL_DELAY = 2  
+            CONTENT_THRESHOLD = 50
+            REASONING_THRESHOLD = 50
             response = None 
         
             for attempt in range(MAX_RETRIES):
@@ -171,7 +173,6 @@ class TextChatAtOAI(BaseFnCallModel):
                             ]
                         if hasattr(choice.delta, 'content') and choice.delta.content:
                             yield [Message(role=ASSISTANT, content=choice.delta.content, reasoning_content='')]
-                        # 兼容 map agent 模型
                         if hasattr(choice.delta, 'tool_calls') and choice.delta.tool_calls:
                             function_name = choice.delta.tool_calls[0].function.name
                             function_call = {
@@ -182,32 +183,54 @@ class TextChatAtOAI(BaseFnCallModel):
                             yield [Message(role=ASSISTANT, content=f'<tool_call>{function_json}</tool_call>')]
                     logger.info(f'delta_stream message chunk: {chunk}')
             else:
+
                 full_response = ''
                 full_reasoning_content = ''
+                content_buffer = ''
+                reasoning_content_buffer = ''
+    
                 for chunk in response:
-                    if chunk.choices:
-                        choice = chunk.choices[0]
-                        if hasattr(choice.delta, 'reasoning') and choice.delta.reasoning:
-                            full_reasoning_content += choice.delta.reasoning
-                        if hasattr(choice.delta, 'content') and choice.delta.content:
-                            full_response += choice.delta.content
-                        # 兼容 map agent 模型
-                        if hasattr(choice.delta, 'tool_calls') and choice.delta.tool_calls:
-                            function_name = choice.delta.tool_calls[0].function.name
-                            # function_call = FunctionCall(
-                            #     name=function_name,
-                            #     arguments=choice.delta.tool_calls[0].function.arguments,
-                            # )
-                            # yield [Message(role=ASSISTANT, content='', function_call=function_call)]
-                            function_call = {
-                                'name': function_name,
-                                'arguments': json.loads(choice.delta.tool_calls[0].function.arguments)
-                            }
-                            function_json = json.dumps(function_call, ensure_ascii=False)
-                            logger.info(json.dumps(function_call, ensure_ascii=False, indent=4))
-                            full_response += f'<tool_call>{function_json}</tool_call>'
+                    if not chunk.choices:
+                        continue
+                    
+                    choice = chunk.choices[0]
+                    new_content = choice.delta.content if hasattr(choice.delta, 'content') and choice.delta.content else ''
+                    new_reasoning = choice.delta.reasoning if hasattr(choice.delta, 'reasoning') and choice.delta.reasoning else ''
+                    has_tool_calls = hasattr(choice.delta, 'tool_calls') and choice.delta.tool_calls
+    
+                    if new_reasoning:
+                        full_reasoning_content += new_reasoning
+                        reasoning_content_buffer += new_reasoning
+                    
+                    if new_content:
+                        full_response += new_content
+                        content_buffer += new_content
+                    
+                    if has_tool_calls:
+                        function_name = choice.delta.tool_calls[0].function.name
+                        function_call = {
+                            'name': function_name,
+                            'arguments': json.loads(choice.delta.tool_calls[0].function.arguments)
+                        }
+                        function_json = json.dumps(function_call, ensure_ascii=False)
+                        logger.info(json.dumps(function_call, ensure_ascii=False, indent=4))
+                        full_response += f'<tool_call>{function_json}</tool_call>'
+                        content_buffer += '<tool_call>' 
+    
+                    if (len(content_buffer) >= CONTENT_THRESHOLD or
+                        len(reasoning_content_buffer) >= REASONING_THRESHOLD or
+                        '\n' in new_content or
+                        '\n' in new_reasoning):
+                        
                         yield [Message(role=ASSISTANT, content=full_response, reasoning_content=full_reasoning_content)]
+    
+                        content_buffer = ''
+                        reasoning_content_buffer = ''
+    
                     logger.info(f'message chunk: {chunk}')
+    
+                if content_buffer or reasoning_content_buffer:
+                    yield [Message(role=ASSISTANT, content=full_response, reasoning_content=full_reasoning_content)]
         except OpenAIError as ex:
             raise ModelServiceError(exception=ex)
 
