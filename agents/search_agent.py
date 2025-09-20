@@ -95,8 +95,8 @@ class SearchAgent(Assistant):
                             content=tool_result,
                         )
                         messages.append(fn_msg)
-                        response.append(fn_msg)
-                        yield response
+                        # response.append(fn_msg)
+                        # yield response
                         used_any_tool = True
                 if not used_any_tool:
                     logger.info(f'{self.name} not used any tool, skip out')
