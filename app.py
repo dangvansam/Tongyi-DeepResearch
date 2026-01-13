@@ -11,8 +11,8 @@ from visit import Visit
 from scholar import Scholar
 from tool_python import PythonInterpreter
 
-DR_MODEL_NAME = os.getenv("DR_MODEL_NAME", "")
-DR_MODEL_SERVER = os.getenv("DR_MODEL_SERVER", "")
+DR_MODEL_NAME = os.getenv("DR_MODEL_NAME", "Qwen3-30B-A3B-Thinking-2507-FP8")
+DR_MODEL_SERVER = os.getenv("DR_MODEL_SERVER", "http://localhost:8000/v1")
 DR_MODEL_API_KEY = os.getenv("DR_MODEL_API_KEY", "")
 
 ROOT_RESOURCE = os.path.join(os.path.dirname(__file__), 'resource')

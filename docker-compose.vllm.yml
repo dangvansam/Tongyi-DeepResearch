@@ -1,0 +1,38 @@
+version: "3.8"
+
+# =============================================================================
+# vLLM Docker Compose Configuration - Single Service
+# Usage: MODEL=<model> docker compose -f docker-compose.vllm.yml up
+# =============================================================================
+
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.12.0
+    # image: nvcr.io/nvidia/vllm:25.11-py3
+    container_name: vllm-server
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    volumes:
+      - ${HF_HOME:-~/.cache/huggingface}:/root/.cache/huggingface
+    environment:
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HF_HOME=/root/.cache/huggingface
+      - VLLM_ATTENTION_BACKEND=${VLLM_ATTENTION_BACKEND:-FLASH_ATTN}
+      - VLLM_USE_FLASHINFER_MOE_FP8=${VLLM_USE_FLASHINFER_MOE_FP8:-0}
+      - VLLM_USE_FLASHINFER_MOE_FP4=${VLLM_USE_FLASHINFER_MOE_FP4:-0}
+      - VLLM_FLASHINFER_MOE_BACKEND=${VLLM_FLASHINFER_MOE_BACKEND:-latency}
+      - VLLM_USE_DEEP_GEMM=${VLLM_USE_DEEP_GEMM:-0}
+      - VLLM_USE_TRTLLM_ATTENTION=${VLLM_USE_TRTLLM_ATTENTION:-0}
+    ports:
+      - "${VLLM_PORT:-8000}:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${GPU_DEVICES:-0}"]
+              capabilities: [gpu]
+    restart: unless-stopped
+    command: ${VLLM_ARGS}
